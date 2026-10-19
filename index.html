@@ -262,7 +262,7 @@ function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null 
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
 keyInput.value = lsGet(LS_KEY, '');
-modelInput.value = lsGet(LS_MODEL, 'gemini-2.0-flash');
+modelInput.value = lsGet(LS_MODEL, 'gemini-3.8-flash');
 wakeInput.value = lsGet(LS_WAKE, 'grimmy');
 function wakeWord() { return (lsGet(LS_WAKE, 'grimmy') || 'grimmy').toLowerCase(); }
 
@@ -270,7 +270,7 @@ gearEl.onclick = function () { panelEl.classList.toggle('hidden'); };
 [keyInput, modelInput, wakeInput].forEach(function (el) {
   el.addEventListener('change', function () {
     lsSet(LS_KEY, keyInput.value.trim());
-    lsSet(LS_MODEL, modelInput.value.trim() || 'gemini-2.0-flash');
+    lsSet(LS_MODEL, modelInput.value.trim() || 'gemini-3.8-flash');
     lsSet(LS_WAKE, (wakeInput.value.trim() || 'grimmy').toLowerCase());
     panelNote('Saved on this device.');
   });
@@ -344,7 +344,7 @@ function askGrimmy(promptText) {
     flashCaption('Add your API key in the settings gear first.');
     return;
   }
-  var model = lsGet(LS_MODEL, 'gemini-2.0-flash').trim() || 'gemini-2.0-flash';
+  var model = lsGet(LS_MODEL, 'gemini-3.8-flash').trim() || 'gemini-3.8-flash';
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
     encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
   fetch(url, {
