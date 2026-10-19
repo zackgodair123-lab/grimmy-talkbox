@@ -64,6 +64,10 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 }
 #listen-btn:hover { background:#7c3aed; }
 #panel-status { font-size:11px; opacity:.75; min-height:16px; word-break:break-word; }
+#vad-meter { height:6px; background:#171226; border-radius:3px; margin:6px 0 2px; overflow:hidden; }
+#vad-fill { height:100%; width:0%; background:#8b5cf6; border-radius:3px; }
+#vad-log { font-size:10px; opacity:.7; max-height:72px; overflow-y:auto; word-break:break-word; margin-top:4px; }
+#vad-log div { margin-bottom:2px; }
 </style>
 </head>
 <body>
@@ -78,7 +82,9 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
     <div class="row"><label>Model</label><input id="set-model" type="text" autocomplete="off"></div>
     <div class="row"><label>Wake word</label><input id="set-wake" type="text" autocomplete="off"></div>
     <button id="listen-btn">Start listening</button>
+    <div id="vad-meter"><div id="vad-fill"></div></div>
     <div id="panel-status"></div>
+    <div id="vad-log"></div>
   </div>
 </div>
 <script>
@@ -256,6 +262,22 @@ var modelInput = document.getElementById('set-model');
 var wakeInput = document.getElementById('set-wake');
 var listenBtn = document.getElementById('listen-btn');
 var panelStatus = document.getElementById('panel-status');
+var vadLogEl = document.getElementById('vad-log');
+var vadFillEl = document.getElementById('vad-fill');
+function vlog(t) {
+  try {
+    var d = document.createElement('div');
+    d.textContent = t;
+    vadLogEl.appendChild(d);
+    while (vadLogEl.children.length > 30) vadLogEl.removeChild(vadLogEl.firstChild);
+    vadLogEl.scrollTop = vadLogEl.scrollHeight;
+  } catch (e) {}
+}
+function ensureAC() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return false; } }
+  try { if (AC.state === 'suspended') AC.resume(); } catch (e) {}
+  return true;
+}
 
 var LS_KEY = 'grimmy_gemini_key', LS_MODEL = 'grimmy_gemini_model', LS_WAKE = 'grimmy_wake';
 function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
@@ -314,13 +336,12 @@ function startListenAudio() {
     .then(function (stream) {
       if (!listenWanted) { try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} return; }
       micStream = stream;
-      try { AC = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch (e) {
+      if (!AC && !ensureAC()) {
         panelNote('Audio not supported in this browser.');
-        listenWanted = false; listenBtn.textContent = 'Start listening';
+        listenWanted = false; listenBtn.textContent = 'Start listening'; setMic(false);
         return;
       }
-      try { if (AC.state === 'suspended') AC.resume(); } catch (e) {}
+      vlog('mic open');
       micNode = AC.createMediaStreamSource(stream);
       analyser = AC.createAnalyser();
       analyser.fftSize = 2048;
@@ -335,6 +356,7 @@ function startListenAudio() {
           samples.sort(function (a, b) { return a - b; });
           vad.ambient = Math.max(0.008, samples[Math.floor(samples.length * 0.7)]);
           setMic(true);
+          vlog('ambient ' + vad.ambient.toFixed(4) + ' - talk to test the bar');
           panelNote('Listening for "' + wakeWord() + '"...');
           vadLoop();
         }
@@ -351,6 +373,7 @@ function vadLoop() {
   var level = rmsLevel();
   var now = Date.now();
   var thresh = vad.ambient * 3.2;
+  try { vadFillEl.style.width = Math.min(100, (level / (thresh * 2)) * 100) + '%'; } catch (e) {}
   if (speaking || queue.length || now < vad.cooldownUntil) {
     if (vad.state === 'recording') stopRecording(false);
     vad.state = 'idle';
@@ -389,6 +412,7 @@ function startRecording() {
   try { vad.rec.start(250); }
   catch (e) { vad.state = 'idle'; vad.rec = null; return; }
   vad.state = 'recording';
+  vlog('speech detected, recording');
 }
 
 function stopRecording(send) {
@@ -406,6 +430,7 @@ function transcribeBlob(blob, type) {
   if (!blob || blob.size < 800) return;
   var key = lsGet(LS_KEY, '').trim();
   if (!key) { panelNote('Add your Gemini API key in settings first.'); return; }
+  vlog('transcribing ' + Math.round(blob.size / 1024) + 'kb');
   var reader = new FileReader();
   reader.onload = function () {
     var b64 = String(reader.result || '').split(',')[1];
@@ -423,12 +448,14 @@ function transcribeBlob(blob, type) {
         generationConfig: { maxOutputTokens: 120, temperature: 0.2 }
       })
     }).then(function (r) { return r.json(); }).then(function (j) {
+      if (j && j.error) { vlog('transcribe error: ' + (j.error.message || 'unknown')); return; }
       var t = j && j.candidates && j.candidates[0] && j.candidates[0].content &&
         j.candidates[0].content.parts && j.candidates[0].content.parts[0] &&
         j.candidates[0].content.parts[0].text;
       t = String(t || '').trim();
+      vlog('heard: "' + t + '"');
       if (t && t.toUpperCase() !== 'NOTHING') heard(t);
-    }).catch(function () {});
+    }).catch(function () { vlog('transcribe failed'); });
   };
   reader.readAsDataURL(blob);
 }
@@ -460,6 +487,7 @@ function askGrimmy(promptText) {
     flashCaption('Add your API key in the settings gear first.');
     return;
   }
+  vlog('asking brain...');
   var model = lsGet(LS_MODEL, 'gemini-3.8-flash').trim() || 'gemini-3.8-flash';
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
     encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
@@ -478,9 +506,9 @@ function askGrimmy(promptText) {
       res.j.candidates[0].content.parts && res.j.candidates[0].content.parts[0] &&
       res.j.candidates[0].content.parts[0].text;
     txt = cleanReply(txt);
-    if (txt) { queue.push(txt); pump(); }
+    if (txt) { vlog('replying'); queue.push(txt); pump(); }
     else panelNote('Brain error: ' + ((res.j && res.j.error && res.j.error.message) || 'empty reply'));
-  }).catch(function (e) { panelNote('Brain unreachable. Check connection.'); });
+  }).catch(function (e) { vlog('brain unreachable'); panelNote('Brain unreachable. Check connection.'); });
 }
 
 function setListen(on) {
@@ -505,7 +533,7 @@ function setListen(on) {
     setMic(false); panelNote('Stopped.');
   }
 }
-listenBtn.onclick = function () { setListen(!listenWanted); };
+listenBtn.onclick = function () { ensureAC(); setListen(!listenWanted); };
 
 var askParam = qs.get('ask');
 if (askParam !== null) {
