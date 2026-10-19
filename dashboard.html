@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grimmy AI — dashboard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html { -webkit-text-size-adjust:100%; }
+body {
+  background:#0a0812; color:#e8e4f5;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.5; min-height:100vh;
+}
+.wrap { max-width:560px; margin:0 auto; padding:20px 16px 40px; }
+header { text-align:center; margin:8px 0 20px; }
+header h1 { font-size:28px; letter-spacing:.5px; color:#fff; }
+header h1 .skull { color:#8b5cf6; }
+header .sub { color:#a89ccf; font-size:14px; margin-top:2px; }
+.pill {
+  display:inline-block; margin-top:10px; padding:5px 14px; border-radius:999px;
+  font-size:12px; font-weight:600; letter-spacing:.4px;
+  background:rgba(139,92,246,.14); color:#b7a6f5; border:1px solid rgba(139,92,246,.4);
+}
+.pill.on { background:rgba(52,211,153,.12); color:#6ee7b7; border-color:rgba(52,211,153,.4); }
+.pill.off { background:rgba(251,191,36,.10); color:#fcd34d; border-color:rgba(251,191,36,.35); }
+.pill-note { display:block; font-size:11px; color:#8d84ad; margin-top:6px; font-weight:400; }
+.card {
+  background:#141020; border:1px solid rgba(139,92,246,.25);
+  border-radius:14px; padding:16px; margin-bottom:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.35);
+}
+.card h2 { font-size:16px; color:#c4b5fd; margin-bottom:12px; letter-spacing:.3px; }
+.card h3 { font-size:13px; color:#a89ccf; margin:12px 0 6px; text-transform:uppercase; letter-spacing:.6px; }
+label.field { display:block; margin-bottom:14px; font-size:13px; color:#cfc8e8; }
+label.field .lab { display:block; margin-bottom:6px; font-weight:600; }
+textarea, input[type="number"] {
+  width:100%; background:#0d0a18; border:1px solid rgba(139,92,246,.35);
+  color:#fff; border-radius:8px; padding:10px; font-size:14px; font-family:inherit;
+}
+textarea { resize:vertical; min-height:120px; line-height:1.5; }
+textarea:focus, input[type="number"]:focus { outline:none; border-color:#8b5cf6; }
+input[type="range"] { width:100%; accent-color:#8b5cf6; margin-top:6px; }
+.pace-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
+#pace-val { color:#c4b5fd; font-weight:700; }
+label.check {
+  display:flex; align-items:center; gap:10px; margin-bottom:10px;
+  font-size:14px; color:#e8e4f5; cursor:pointer;
+}
+label.check input { width:18px; height:18px; accent-color:#8b5cf6; }
+button.primary {
+  width:100%; background:#8b5cf6; border:none; color:#fff; border-radius:10px;
+  padding:13px; font-size:15px; font-weight:700; cursor:pointer; margin-top:4px;
+}
+button.primary:hover { background:#7c3aed; }
+button.primary:active { transform:scale(.99); }
+.hint { font-size:12px; color:#8d84ad; margin-top:10px; }
+.copied { color:#6ee7b7; font-weight:700; }
+.hidden { display:none; }
+.placeholder { color:#8d84ad; font-size:13px; }
+ul.clean { list-style:none; }
+ul.clean li {
+  background:#0d0a18; border:1px solid rgba(139,92,246,.18);
+  border-radius:8px; padding:8px 10px; margin-bottom:6px; font-size:13px;
+}
+ul.clean li b { color:#c4b5fd; }
+.howto { padding-left:18px; font-size:14px; color:#d8d2ec; }
+.howto li { margin-bottom:8px; }
+.howto b { color:#c4b5fd; }
+footer { text-align:center; font-size:12px; color:#8d84ad; margin-top:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1><span class="skull">Grimmy</span> AI</h1>
+    <p class="sub">chat companion for zackplayspro</p>
+    <div id="status-pill" class="pill">checking…</div>
+    <span id="status-note" class="pill-note"></span>
+  </header>
+
+  <section class="card">
+    <h2>Settings</h2>
+    <form id="settings-form">
+      <label class="field">
+        <span class="lab">Personality</span>
+        <textarea id="set-personality" rows="7"></textarea>
+      </label>
+      <label class="field">
+        <span class="pace-row"><span class="lab">Reply pace</span><span><span id="pace-val">30</span>s</span></span>
+        <input type="range" id="set-pace" min="15" max="120" step="5">
+      </label>
+      <label class="field">
+        <span class="lab">Max replies per 10 min</span>
+        <input type="number" id="set-maxreplies" min="1" max="30">
+      </label>
+      <label class="check"><input type="checkbox" id="set-welcome"> Welcome new chatters</label>
+      <label class="check"><input type="checkbox" id="set-events"> React to subs/raids</label>
+    </form>
+    <button class="primary" id="send-btn">Send settings to Grimmy</button>
+    <p class="hint">Copies your settings as a message. Paste it to Grimmy in chat and he'll apply it to the bot. <span id="copied" class="copied hidden">Copied!</span></p>
+  </section>
+
+  <section class="card">
+    <h2>Memory</h2>
+    <div id="memory-body"><p class="placeholder">Memory appears after the bot runs.</p></div>
+  </section>
+
+  <section class="card">
+    <h2>How it works</h2>
+    <ul class="howto">
+      <li>The bot lives on Grimmy's computer and stays connected to your Twitch chat.</li>
+      <li>It talks in chat as <b>grimmy_ai</b> and answers when someone says "grimmy".</li>
+      <li>It welcomes new chatters and followers, and hypes up subs and raids.</li>
+      <li>Posting needs a one-time Twitch login for grimmy_ai — coming next.</li>
+    </ul>
+  </section>
+
+  <footer>Free forever. Settings save on this device.</footer>
+
+</div>
+
+<script>
+(function () {
+  var LS_KEY = 'grimmy_ai_settings';
+  var DEFAULTS = {
+    personality: "You are Grimmy, a skeleton with glowing purple eyes and a purple hooded cloak, the on-stream co-host of Zack's Twitch channel zackplayspro. Zack plays Fortnite Zero Build on Xbox. You are playful and witty, you lightly roast Zack, hype up good plays, and riff with chat. Keep every reply to 1-2 short sentences, plain text, no emojis. Never break character.",
+    pace: 30,
+    maxReplies: 6,
+    welcome: true,
+    events: true
+  };
+
+  var els = {
+    personality: document.getElementById('set-personality'),
+    pace: document.getElementById('set-pace'),
+    paceVal: document.getElementById('pace-val'),
+    maxReplies: document.getElementById('set-maxreplies'),
+    welcome: document.getElementById('set-welcome'),
+    events: document.getElementById('set-events'),
+    send: document.getElementById('send-btn'),
+    copied: document.getElementById('copied'),
+    pill: document.getElementById('status-pill'),
+    pillNote: document.getElementById('status-note'),
+    memory: document.getElementById('memory-body')
+  };
+
+  function readForm() {
+    return {
+      personality: els.personality.value,
+      pace: parseInt(els.pace.value, 10) || DEFAULTS.pace,
+      maxReplies: parseInt(els.maxReplies.value, 10) || DEFAULTS.maxReplies,
+      welcome: !!els.welcome.checked,
+      events: !!els.events.checked
+    };
+  }
+
+  function fillForm(s) {
+    els.personality.value = s.personality;
+    els.pace.value = s.pace;
+    els.paceVal.textContent = s.pace;
+    els.maxReplies.value = s.maxReplies;
+    els.welcome.checked = !!s.welcome;
+    els.events.checked = !!s.events;
+  }
+
+  function loadSettings() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(LS_KEY)); } catch (e) { s = null; }
+    fillForm(Object.assign({}, DEFAULTS, s || {}));
+  }
+
+  function saveSettings() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(readForm())); } catch (e) {}
+  }
+
+  ['set-personality', 'set-pace', 'set-maxreplies', 'set-welcome', 'set-events'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      els.paceVal.textContent = els.pace.value;
+      saveSettings();
+    });
+    el.addEventListener('change', saveSettings);
+  });
+
+  function copyText(t) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(t);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = t;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        if (document.execCommand('copy')) resolve();
+        else reject(new Error('copy failed'));
+      } catch (e) { reject(e); }
+      document.body.removeChild(ta);
+    });
+  }
+
+  els.send.addEventListener('click', function () {
+    var msg = 'Grimmy AI settings update: ' + JSON.stringify(readForm());
+    copyText(msg).then(function () {
+      els.copied.classList.remove('hidden');
+      setTimeout(function () { els.copied.classList.add('hidden'); }, 2500);
+    }).catch(function () {
+      els.copied.textContent = 'Copy failed — long-press to copy manually.';
+      els.copied.classList.remove('hidden');
+    });
+  });
+
+  function setPill(state, note) {
+    els.pill.className = 'pill' + (state === 'on' ? ' on' : state === 'off' ? ' off' : '');
+    els.pill.textContent = state === 'on' ? 'online' : state === 'off' ? 'offline / starting' : 'checking…';
+    els.pillNote.textContent = note || '';
+  }
+
+  function checkStatus() {
+    fetch('./grimmy-status.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('no status'); return r.json(); })
+      .then(function (j) {
+        if (j && j.online) {
+          var note = j.last_seen ? ('last seen ' + j.last_seen) : (j.mode ? ('mode: ' + j.mode) : '');
+          setPill('on', note);
+        } else {
+          setPill('off');
+        }
+      })
+      .catch(function () { setPill('off'); });
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function listItems(arr) {
+    return arr.map(function (it) {
+      if (it && typeof it === 'object') {
+        var name = esc(it.name || it.user || '');
+        var note = esc(it.note || it.text || '');
+        return '<li><b>' + name + '</b>' + (note ? ' — ' + note : '') + '</li>';
+      }
+      return '<li>' + esc(it) + '</li>';
+    }).join('');
+  }
+
+  function renderMemory(j) {
+    var regulars = (j && Array.isArray(j.regulars)) ? j.regulars : [];
+    var lore = (j && Array.isArray(j.lore)) ? j.lore : [];
+    if (!regulars.length && !lore.length) return false;
+    var html = '';
+    if (regulars.length) html += '<h3>Regulars</h3><ul class="clean">' + listItems(regulars) + '</ul>';
+    if (lore.length) html += '<h3>Channel lore</h3><ul class="clean">' + listItems(lore) + '</ul>';
+    els.memory.innerHTML = html;
+    return true;
+  }
+
+  function checkMemory() {
+    fetch('./grimmy-memory.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('no memory'); return r.json(); })
+      .then(function (j) { renderMemory(j); })
+      .catch(function () { /* placeholder stays */ });
+  }
+
+  loadSettings();
+  checkStatus();
+  checkMemory();
+  setInterval(checkStatus, 30000);
+})();
+</script>
+</body>
+</html>
