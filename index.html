@@ -264,6 +264,15 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 keyInput.value = lsGet(LS_KEY, '');
 modelInput.value = lsGet(LS_MODEL, 'gemini-3.8-flash');
 wakeInput.value = lsGet(LS_WAKE, 'grimmy');
+// Google retires old models for new keys; migrate any saved retired name.
+(function migrateModel() {
+  var retired = ['gemini-2.0-flash', 'gemini-2.5-flash'];
+  var cur = lsGet(LS_MODEL, '');
+  if (cur && retired.indexOf(cur) !== -1) {
+    lsSet(LS_MODEL, 'gemini-3.8-flash');
+    modelInput.value = 'gemini-3.8-flash';
+  }
+})();
 function wakeWord() { return (lsGet(LS_WAKE, 'grimmy') || 'grimmy').toLowerCase(); }
 
 gearEl.onclick = function () { panelEl.classList.toggle('hidden'); };
