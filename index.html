@@ -101,24 +101,45 @@ function speakLine(text) {
   capText.textContent = text;
   cap.classList.remove('hidden');
   var estMs = Math.max(2500, text.length * 85);
+  var ended = false;
+  var fellBack = false;
+  var audio = null;
+  function done() {
+    if (ended) return; ended = true;
+    try { if (audio) audio.pause(); } catch (e) {}
+    try { speechSynthesis.cancel(); } catch (e) {}
+    clearTimeout(safety);
+    finish();
+  }
+  var safety = setTimeout(done, estMs + 8000);
+  function builtinFallback() {
+    if (fellBack || ended) return; fellBack = true;
+    try { if (audio) audio.pause(); } catch (e) {}
+    try {
+      var u = new SpeechSynthesisUtterance(text);
+      var v = pickVoice();
+      if (v) u.voice = v;
+      u.pitch = 0.55; u.rate = 0.95; u.volume = 1;
+      u.onend = done; u.onerror = done;
+      u.onstart = function () { flap(true); };
+      speechSynthesis.speak(u);
+      setTimeout(function () { if (speaking && !flapTimer && !ended) flap(true); }, 700);
+    } catch (e) {
+      flap(true);
+      setTimeout(done, Math.min(estMs, 8000));
+    }
+  }
   try {
-    var u = new SpeechSynthesisUtterance(text);
-    var v = pickVoice();
-    if (v) u.voice = v;
-    u.pitch = 0.55; u.rate = 0.95; u.volume = 1;
-    var ended = false;
-    var done = function () {
-      if (ended) return; ended = true;
-      clearTimeout(safety); finish();
-    };
-    var safety = setTimeout(done, estMs + 5000);
-    u.onend = done; u.onerror = done;
-    u.onstart = function () { flap(true); };
-    speechSynthesis.speak(u);
-    setTimeout(function () { if (speaking && !flapTimer) flap(true); }, 700);
+    audio = new Audio('https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=' + encodeURIComponent(text));
+    var started = false;
+    audio.onplay = function () { started = true; flap(true); };
+    audio.onended = done;
+    audio.onerror = function () { builtinFallback(); };
+    var pr = audio.play();
+    if (pr && pr.catch) pr.catch(function () { builtinFallback(); });
+    setTimeout(function () { if (!started) builtinFallback(); }, 5000);
   } catch (e) {
-    flap(true);
-    setTimeout(finish, estMs);
+    builtinFallback();
   }
 }
 function pump() {
