@@ -293,68 +293,156 @@ function flashCaption(t) {
 
 var GRIMMY_SYS = "You are Grimmy, a skeleton with glowing purple eyes and a purple hooded cloak, the on-stream co-host of Zack's Twitch channel zackplayspro. Zack plays Fortnite Zero Build on Xbox. You are playful and witty, you lightly roast Zack, hype up good plays, and riff with chat. You are SPEAKING ALOUD on a livestream: keep every reply to 1-2 short sentences, plain spoken text only. No emojis, no markdown, no hashtags, no stage directions, no quotation marks around the reply. Never break character, never mention you are an AI.";
 
-var rec = null, listenWanted = false;
-var recStartTime = 0, failStreak = 0, restartTimer = null;
+var listenWanted = false;
+var AC = null, micStream = null, analyser = null, micNode = null;
+var vad = { ambient: 0.01, state: 'idle', rec: null, chunks: [], wantSend: false, lastMime: 'audio/webm', loudFor: 0, quietFor: 0, recStart: 0, cooldownUntil: 0 };
+var VAD_TICK = 100;
 
-function startRec() {
-  var SRC = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SRC) {
-    panelNote('Speech recognition not supported here. Open this page in Chrome.');
-    listenWanted = false; listenBtn.textContent = 'Start listening'; setMic(false);
-    return;
-  }
-  try { if (rec) rec.abort(); } catch (e) {}
-  if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
-  rec = new SRC();
-  rec.continuous = true;
-  rec.interimResults = false;
-  rec.lang = 'en-US';
-  rec.maxAlternatives = 1;
-  rec.onstart = function () {
-    recStartTime = Date.now();
-    failStreak = 0;
-    setMic(true);
-    panelNote('Listening for "' + wakeWord() + '"...');
-  };
-  rec.onresult = function (ev) {
-    for (var i = ev.resultIndex; i < ev.results.length; i++) {
-      if (ev.results[i].isFinal) heard(ev.results[i][0].transcript || '');
-    }
-  };
-  rec.onend = function () {
-    setMic(false);
-    if (!listenWanted) return;
-    var lived = Date.now() - recStartTime;
-    if (lived < 1500) {
-      failStreak++;
-      var wait = Math.min(15000, 1500 * Math.pow(2, failStreak));
-      panelNote('Mic hiccup, retrying...');
-      restartTimer = setTimeout(function () { if (listenWanted) startRec(); }, wait);
-    } else {
-      restartTimer = setTimeout(function () { if (listenWanted) startRec(); }, 400);
-    }
-  };
-  rec.onerror = function (ev) {
-    var err = (ev && ev.error) || '';
-    if (err === 'not-allowed' || err === 'service-not-allowed') {
-      listenWanted = false; setMic(false); listenBtn.textContent = 'Start listening';
+function rmsLevel() {
+  try {
+    if (!analyser) return 0;
+    var buf = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buf);
+    var sum = 0;
+    for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    return Math.sqrt(sum / buf.length);
+  } catch (e) { return 0; }
+}
+
+function startListenAudio() {
+  navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+    .then(function (stream) {
+      if (!listenWanted) { try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} return; }
+      micStream = stream;
+      try { AC = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) {
+        panelNote('Audio not supported in this browser.');
+        listenWanted = false; listenBtn.textContent = 'Start listening';
+        return;
+      }
+      try { if (AC.state === 'suspended') AC.resume(); } catch (e) {}
+      micNode = AC.createMediaStreamSource(stream);
+      analyser = AC.createAnalyser();
+      analyser.fftSize = 2048;
+      micNode.connect(analyser);
+      panelNote('Calibrating mic, stay quiet...');
+      var samples = [];
+      var cal = setInterval(function () {
+        if (!listenWanted) { clearInterval(cal); return; }
+        samples.push(rmsLevel());
+        if (samples.length >= 12) {
+          clearInterval(cal);
+          samples.sort(function (a, b) { return a - b; });
+          vad.ambient = Math.max(0.008, samples[Math.floor(samples.length * 0.7)]);
+          setMic(true);
+          panelNote('Listening for "' + wakeWord() + '"...');
+          vadLoop();
+        }
+      }, 100);
+    })
+    .catch(function () {
       panelNote('Mic blocked. Allow the microphone for this page, then start again.');
-    } else if (err === 'audio-capture') {
-      panelNote('Mic is busy. Close other apps using the mic, then retry.');
-    }
+      listenWanted = false; listenBtn.textContent = 'Start listening'; setMic(false);
+    });
+}
+
+function vadLoop() {
+  if (!listenWanted || !analyser) return;
+  var level = rmsLevel();
+  var now = Date.now();
+  var thresh = vad.ambient * 3.2;
+  if (speaking || queue.length || now < vad.cooldownUntil) {
+    if (vad.state === 'recording') stopRecording(false);
+    vad.state = 'idle';
+  } else if (vad.state === 'idle') {
+    if (level > thresh) { vad.state = 'maybe'; vad.loudFor = now; }
+  } else if (vad.state === 'maybe') {
+    if (level > thresh) { if (now - vad.loudFor > 250) startRecording(); }
+    else vad.state = 'idle';
+  } else if (vad.state === 'recording') {
+    if (level > thresh) vad.quietFor = now;
+    else if (now - vad.quietFor > 1300) stopRecording(true);
+    else if (now - vad.recStart > 12000) stopRecording(true);
+  }
+  setTimeout(vadLoop, VAD_TICK);
+}
+
+function startRecording() {
+  if (!window.MediaRecorder) { vad.state = 'idle'; return; }
+  vad.chunks = [];
+  var mime = '';
+  try {
+    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) mime = 'audio/webm;codecs=opus';
+    else if (MediaRecorder.isTypeSupported('audio/webm')) mime = 'audio/webm';
+  } catch (e) {}
+  try { vad.rec = mime ? new MediaRecorder(micStream, { mimeType: mime }) : new MediaRecorder(micStream); }
+  catch (e) { vad.state = 'idle'; return; }
+  vad.rec.ondataavailable = function (ev) { if (ev.data && ev.data.size) vad.chunks.push(ev.data); };
+  vad.rec.onstop = function () {
+    var blob = new Blob(vad.chunks, { type: vad.lastMime || 'audio/webm' });
+    var send = vad.wantSend;
+    vad.chunks = []; vad.wantSend = false;
+    if (send) transcribeBlob(blob, vad.lastMime);
   };
-  try { rec.start(); }
-  catch (e) { panelNote('Could not start mic.'); }
+  vad.quietFor = Date.now();
+  vad.recStart = Date.now();
+  try { vad.rec.start(250); }
+  catch (e) { vad.state = 'idle'; vad.rec = null; return; }
+  vad.state = 'recording';
+}
+
+function stopRecording(send) {
+  var r = vad.rec;
+  vad.rec = null;
+  vad.state = 'idle';
+  vad.cooldownUntil = Date.now() + 1500;
+  vad.wantSend = !!send;
+  vad.lastMime = (r && r.mimeType) || 'audio/webm';
+  if (!r) return;
+  try { if (r.state !== 'inactive') r.stop(); } catch (e) {}
+}
+
+function transcribeBlob(blob, type) {
+  if (!blob || blob.size < 800) return;
+  var key = lsGet(LS_KEY, '').trim();
+  if (!key) { panelNote('Add your Gemini API key in settings first.'); return; }
+  var reader = new FileReader();
+  reader.onload = function () {
+    var b64 = String(reader.result || '').split(',')[1];
+    if (!b64) return;
+    var model = (lsGet(LS_MODEL, 'gemini-3.8-flash').trim() || 'gemini-3.8-flash');
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [
+          { text: 'Transcribe exactly what the person says in this audio. Output only the transcription, no commentary. If there is no intelligible speech, output NOTHING.' },
+          { inlineData: { mimeType: type || 'audio/webm', data: b64 } }
+        ] }],
+        generationConfig: { maxOutputTokens: 120, temperature: 0.2 }
+      })
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      var t = j && j.candidates && j.candidates[0] && j.candidates[0].content &&
+        j.candidates[0].content.parts && j.candidates[0].content.parts[0] &&
+        j.candidates[0].content.parts[0].text;
+      t = String(t || '').trim();
+      if (t && t.toUpperCase() !== 'NOTHING') heard(t);
+    }).catch(function () {});
+  };
+  reader.readAsDataURL(blob);
 }
 
 function heard(raw) {
   var t = String(raw || '').trim();
   if (!t) return;
   var w = wakeWord();
-  var ix = t.toLowerCase().indexOf(w);
+  var low = t.toLowerCase();
+  var ix = low.indexOf(w), used = w.length;
+  if (ix === -1) { ix = low.indexOf('grim'); used = 4; }
   if (ix === -1) return;
   if (speaking || queue.length) return;
-  var said = t.slice(ix + w.length).replace(/^[\s,.:;!\-]+/, '').trim();
+  var said = t.slice(ix + used).replace(/^[\s,.:;!\-]+/, '').trim();
   if (!said) said = '(Zack just said your name to get your attention. Greet him briefly.)';
   askGrimmy(said);
 }
@@ -398,13 +486,22 @@ function askGrimmy(promptText) {
 function setListen(on) {
   listenWanted = !!on;
   listenBtn.textContent = listenWanted ? 'Stop listening' : 'Start listening';
-  failStreak = 0;
-  if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
   if (listenWanted) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+      panelNote('Mic capture not supported here. Use Chrome.');
+      listenWanted = false; listenBtn.textContent = 'Start listening';
+      return;
+    }
+    vad.state = 'idle'; vad.cooldownUntil = 0; vad.chunks = [];
     panelNote('Starting mic...');
-    startRec();
+    startListenAudio();
   } else {
-    try { if (rec) rec.abort(); } catch (e) {}
+    try { if (vad.rec && vad.rec.state !== 'inactive') vad.rec.stop(); } catch (e) {}
+    vad.rec = null; vad.state = 'idle'; vad.chunks = [];
+    try { if (micStream) micStream.getTracks().forEach(function (tr) { tr.stop(); }); } catch (e) {}
+    micStream = null;
+    try { if (AC && AC.close) AC.close(); } catch (e) {}
+    AC = null; analyser = null; micNode = null;
     setMic(false); panelNote('Stopped.');
   }
 }
