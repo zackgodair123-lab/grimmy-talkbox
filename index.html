@@ -285,6 +285,7 @@ function flashCaption(t) {
 var GRIMMY_SYS = "You are Grimmy, a skeleton with glowing purple eyes and a purple hooded cloak, the on-stream co-host of Zack's Twitch channel zackplayspro. Zack plays Fortnite Zero Build on Xbox. You are playful and witty, you lightly roast Zack, hype up good plays, and riff with chat. You are SPEAKING ALOUD on a livestream: keep every reply to 1-2 short sentences, plain spoken text only. No emojis, no markdown, no hashtags, no stage directions, no quotation marks around the reply. Never break character, never mention you are an AI.";
 
 var rec = null, listenWanted = false;
+var recStartTime = 0, failStreak = 0, restartTimer = null;
 
 function startRec() {
   var SRC = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -294,28 +295,46 @@ function startRec() {
     return;
   }
   try { if (rec) rec.abort(); } catch (e) {}
+  if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
   rec = new SRC();
   rec.continuous = true;
   rec.interimResults = false;
   rec.lang = 'en-US';
   rec.maxAlternatives = 1;
+  rec.onstart = function () {
+    recStartTime = Date.now();
+    failStreak = 0;
+    setMic(true);
+    panelNote('Listening for "' + wakeWord() + '"...');
+  };
   rec.onresult = function (ev) {
     for (var i = ev.resultIndex; i < ev.results.length; i++) {
       if (ev.results[i].isFinal) heard(ev.results[i][0].transcript || '');
     }
   };
   rec.onend = function () {
-    if (listenWanted) setTimeout(function () { if (listenWanted) startRec(); }, 350);
-    else setMic(false);
+    setMic(false);
+    if (!listenWanted) return;
+    var lived = Date.now() - recStartTime;
+    if (lived < 1500) {
+      failStreak++;
+      var wait = Math.min(15000, 1500 * Math.pow(2, failStreak));
+      panelNote('Mic hiccup, retrying...');
+      restartTimer = setTimeout(function () { if (listenWanted) startRec(); }, wait);
+    } else {
+      restartTimer = setTimeout(function () { if (listenWanted) startRec(); }, 400);
+    }
   };
   rec.onerror = function (ev) {
     var err = (ev && ev.error) || '';
     if (err === 'not-allowed' || err === 'service-not-allowed') {
       listenWanted = false; setMic(false); listenBtn.textContent = 'Start listening';
       panelNote('Mic blocked. Allow the microphone for this page, then start again.');
+    } else if (err === 'audio-capture') {
+      panelNote('Mic is busy. Close other apps using the mic, then retry.');
     }
   };
-  try { rec.start(); setMic(true); panelNote('Listening for "' + wakeWord() + '"...'); }
+  try { rec.start(); }
   catch (e) { panelNote('Could not start mic.'); }
 }
 
@@ -370,13 +389,11 @@ function askGrimmy(promptText) {
 function setListen(on) {
   listenWanted = !!on;
   listenBtn.textContent = listenWanted ? 'Stop listening' : 'Start listening';
+  failStreak = 0;
+  if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
   if (listenWanted) {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
-        try { s.getTracks().forEach(function (tr) { tr.stop(); }); } catch (e) {}
-        startRec();
-      }).catch(function () { startRec(); });
-    } else startRec();
+    panelNote('Starting mic...');
+    startRec();
   } else {
     try { if (rec) rec.abort(); } catch (e) {}
     setMic(false); panelNote('Stopped.');
