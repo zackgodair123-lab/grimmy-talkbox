@@ -104,14 +104,16 @@ function speakLine(text) {
   var ended = false;
   var fellBack = false;
   var audio = null;
+  var durTimer = null;
   function done() {
     if (ended) return; ended = true;
     try { if (audio) audio.pause(); } catch (e) {}
+    try { if (durTimer) clearTimeout(durTimer); } catch (e) {}
     try { speechSynthesis.cancel(); } catch (e) {}
     clearTimeout(safety);
     finish();
   }
-  var safety = setTimeout(done, estMs + 8000);
+  var safety = setTimeout(done, estMs + 5000);
   function builtinFallback() {
     if (fellBack || ended) return; fellBack = true;
     try { if (audio) audio.pause(); } catch (e) {}
@@ -132,6 +134,11 @@ function speakLine(text) {
   try {
     audio = new Audio('https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=' + encodeURIComponent(text));
     var started = false;
+    audio.onloadedmetadata = function () {
+      var d = audio.duration;
+      if (!isFinite(d) || d <= 0) d = estMs / 1000;
+      durTimer = setTimeout(done, Math.max(600, d * 1000) + 350);
+    };
     audio.onplay = function () { started = true; flap(true); };
     audio.onended = done;
     audio.onerror = function () { builtinFallback(); };
