@@ -1,5 +1,136 @@
 {
- "regulars": {},
+ "regulars": {
+  "freakyseafood19": {
+   "display": "freakyseafood19",
+   "messages": 62,
+   "first_seen": 1792443537.378232
+  },
+  "zackplayspro": {
+   "display": "zackplayspro",
+   "messages": 29,
+   "first_seen": 1792443537.571458
+  },
+  "pokemoncommunitygame": {
+   "display": "PokemonCommunityGame",
+   "messages": 70,
+   "first_seen": 1792443978.5023742
+  },
+  "streamelements": {
+   "display": "StreamElements",
+   "messages": 15,
+   "first_seen": 1792444513.1744053
+  },
+  "grimmy_ai": {
+   "display": "grimmy_ai",
+   "messages": 23,
+   "first_seen": 1792444515.281572
+  },
+  "draongirlttv": {
+   "display": "draongirlttv",
+   "messages": 7,
+   "first_seen": 1792444536.9246883
+  },
+  "justanotherblkstreamer": {
+   "display": "justanotherblkstreamer",
+   "messages": 9,
+   "first_seen": 1792444543.9589062
+  },
+  "oweplayz14": {
+   "display": "oweplayz14",
+   "messages": 15,
+   "first_seen": 1792444718.4995475
+  },
+  "treeckotv1": {
+   "display": "treeckotv1",
+   "messages": 5,
+   "first_seen": 1792445255.3136861
+  },
+  "soundalerts": {
+   "display": "SoundAlerts",
+   "messages": 12,
+   "first_seen": 1792445422.5803363
+  },
+  "og_alex_95": {
+   "display": "og_alex_95",
+   "messages": 5,
+   "first_seen": 1792445628.9024827
+  },
+  "the_cryptic_cryptid": {
+   "display": "The_Cryptic_Cryptid",
+   "messages": 4,
+   "first_seen": 1792446110.942419
+  },
+  "nexusqueenn": {
+   "display": "nexusqueenn",
+   "messages": 4,
+   "first_seen": 1792447180.7042634
+  },
+  "sery_bot": {
+   "display": "Sery_Bot",
+   "messages": 7,
+   "first_seen": 1792447961.6714995
+  },
+  "ghostydabz710": {
+   "display": "GhostyDabZ710",
+   "messages": 3,
+   "first_seen": 1792458841.7694573
+  },
+  "ttprinces04": {
+   "display": "ttprinces04",
+   "messages": 43,
+   "first_seen": 1792460000.446854
+  },
+  "kingofthedabs18": {
+   "display": "kingofthedabs18",
+   "messages": 11,
+   "first_seen": 1792477591.2667472
+  },
+  "syrous137": {
+   "display": "Syrous137",
+   "messages": 4,
+   "first_seen": 1792523234.081756
+  },
+  "cheeezburgerhamlet": {
+   "display": "cheeezburgerhamlet",
+   "messages": 7,
+   "first_seen": 1792524026.6360128
+  },
+  "hiddenghoul42": {
+   "display": "hiddenghoul42",
+   "messages": 40,
+   "first_seen": 1792524319.5792146
+  },
+  "gjenevagjeneva": {
+   "display": "GjenevaGjeneva",
+   "messages": 6,
+   "first_seen": 1792525144.5452483
+  },
+  "leica__": {
+   "display": "Leica__",
+   "messages": 1,
+   "first_seen": 1792525844.7970886
+  },
+  "mr_rich_boy": {
+   "display": "Mr_Rich_Boy",
+   "messages": 3,
+   "first_seen": 1792541178.9721973
+  },
+  "frankie122005": {
+   "display": "Frankie122005",
+   "messages": 6,
+   "first_seen": 1792542929.427863
+  },
+  "itsladyblueee": {
+   "display": "itsladyblueee",
+   "messages": 5,
+   "first_seen": 1792551078.5137122
+  },
+  "pinkmahn": {
+   "display": "PiNKMAhN",
+   "messages": 3,
+   "first_seen": 1792555314.0299726
+  }
+ },
  "lore": [],
  "seen_today": []
 }
