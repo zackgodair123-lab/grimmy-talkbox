@@ -2,27 +2,27 @@
  "regulars": {
   "freakyseafood19": {
    "display": "freakyseafood19",
-   "messages": 62,
+   "messages": 130,
    "first_seen": 1792443537.378232
   },
   "zackplayspro": {
    "display": "zackplayspro",
-   "messages": 29,
+   "messages": 122,
    "first_seen": 1792443537.571458
   },
   "pokemoncommunitygame": {
    "display": "PokemonCommunityGame",
-   "messages": 70,
+   "messages": 188,
    "first_seen": 1792443978.5023742
   },
   "streamelements": {
    "display": "StreamElements",
-   "messages": 15,
+   "messages": 42,
    "first_seen": 1792444513.1744053
   },
   "grimmy_ai": {
    "display": "grimmy_ai",
-   "messages": 23,
+   "messages": 113,
    "first_seen": 1792444515.281572
   },
   "draongirlttv": {
@@ -32,7 +32,7 @@
   },
   "justanotherblkstreamer": {
    "display": "justanotherblkstreamer",
-   "messages": 9,
+   "messages": 21,
    "first_seen": 1792444543.9589062
   },
   "oweplayz14": {
@@ -42,32 +42,32 @@
   },
   "treeckotv1": {
    "display": "treeckotv1",
-   "messages": 5,
+   "messages": 32,
    "first_seen": 1792445255.3136861
   },
   "soundalerts": {
    "display": "SoundAlerts",
-   "messages": 12,
+   "messages": 35,
    "first_seen": 1792445422.5803363
   },
   "og_alex_95": {
    "display": "og_alex_95",
-   "messages": 5,
+   "messages": 71,
    "first_seen": 1792445628.9024827
   },
   "the_cryptic_cryptid": {
    "display": "The_Cryptic_Cryptid",
-   "messages": 4,
+   "messages": 16,
    "first_seen": 1792446110.942419
   },
   "nexusqueenn": {
    "display": "nexusqueenn",
-   "messages": 4,
+   "messages": 10,
    "first_seen": 1792447180.7042634
   },
   "sery_bot": {
    "display": "Sery_Bot",
-   "messages": 7,
+   "messages": 30,
    "first_seen": 1792447961.6714995
   },
   "ghostydabz710": {
@@ -77,7 +77,7 @@
   },
   "ttprinces04": {
    "display": "ttprinces04",
-   "messages": 43,
+   "messages": 128,
    "first_seen": 1792460000.446854
   },
   "kingofthedabs18": {
@@ -97,7 +97,7 @@
   },
   "hiddenghoul42": {
    "display": "hiddenghoul42",
-   "messages": 40,
+   "messages": 157,
    "first_seen": 1792524319.5792146
   },
   "gjenevagjeneva": {
@@ -112,23 +112,218 @@
   },
   "mr_rich_boy": {
    "display": "Mr_Rich_Boy",
-   "messages": 3,
+   "messages": 7,
    "first_seen": 1792541178.9721973
   },
   "frankie122005": {
    "display": "Frankie122005",
-   "messages": 6,
+   "messages": 7,
    "first_seen": 1792542929.427863
   },
   "itsladyblueee": {
    "display": "itsladyblueee",
-   "messages": 5,
+   "messages": 52,
    "first_seen": 1792551078.5137122
   },
   "pinkmahn": {
    "display": "PiNKMAhN",
-   "messages": 3,
+   "messages": 11,
    "first_seen": 1792555314.0299726
+  },
+  "packbound420": {
+   "display": "packbound420",
+   "messages": 14,
+   "first_seen": 1792558760.5200899
+  },
+  "gabe3889": {
+   "display": "gabe3889",
+   "messages": 10,
+   "first_seen": 1792559912.149954
+  },
+  "roch8080": {
+   "display": "Roch8080",
+   "messages": 4,
+   "first_seen": 1792605001.749683
+  },
+  "maniac_m3chan1c": {
+   "display": "Maniac_M3chan1c",
+   "messages": 1,
+   "first_seen": 1792608075.8366928
+  },
+  "pandarobbo": {
+   "display": "PandaRobbo",
+   "messages": 2,
+   "first_seen": 1792609947.4015658
+  },
+  "fluffyjodog2012": {
+   "display": "fluffyjodog2012",
+   "messages": 11,
+   "first_seen": 1792629225.7715352
+  },
+  "developingexpatriatexok5w": {
+   "display": "developingexpatriatexok5w",
+   "messages": 1,
+   "first_seen": 1792629855.789997
+  },
+  "experimentalfanatic7o": {
+   "display": "experimentalfanatic7o",
+   "messages": 1,
+   "first_seen": 1792629875.3817258
+  },
+  "ogfazi1": {
+   "display": "OGFazi1",
+   "messages": 1,
+   "first_seen": 1792630291.503039
+  },
+  "ltgsmoker": {
+   "display": "LTGSmoker",
+   "messages": 24,
+   "first_seen": 1792630302.8492668
+  },
+  "capncrunchog": {
+   "display": "Capncrunchog",
+   "messages": 1,
+   "first_seen": 1792630406.8625162
+  },
+  "filmycascade0nrk": {
+   "display": "filmycascade0nrk",
+   "messages": 1,
+   "first_seen": 1792630514.8926554
+  },
+  "bccountry69": {
+   "display": "bccountry69",
+   "messages": 1,
+   "first_seen": 1792716503.4918003
+  },
+  "enriquejr_420": {
+   "display": "enriquejr_420",
+   "messages": 1,
+   "first_seen": 1792866840.8382437
+  },
+  "ricktus_erectus": {
+   "display": "ricktus_erectus",
+   "messages": 1,
+   "first_seen": 1792893557.7692497
+  },
+  "heyitsjuststeph": {
+   "display": "heyitsjuststeph",
+   "messages": 4,
+   "first_seen": 1792948720.8358252
+  },
+  "xxgoatadriexx45": {
+   "display": "xxgoatadriexx45",
+   "messages": 3,
+   "first_seen": 1792950747.0018258
+  },
+  "davee936": {
+   "display": "davee936",
+   "messages": 4,
+   "first_seen": 1792952278.6613698
+  },
+  "babylorinha": {
+   "display": "BabyLorinha",
+   "messages": 7,
+   "first_seen": 1792954148.5942302
+  },
+  "hitmanhoss47": {
+   "display": "HitmanHoss47",
+   "messages": 2,
+   "first_seen": 1792973025.9543147
+  },
+  "tmgst0": {
+   "display": "tmgst0",
+   "messages": 4,
+   "first_seen": 1792988093.0408022
+  },
+  "vbadkarmax": {
+   "display": "vBadKarmaX",
+   "messages": 54,
+   "first_seen": 1792988117.6200967
+  },
+  "midgey01": {
+   "display": "Midgey01",
+   "messages": 4,
+   "first_seen": 1792988232.6598167
+  },
+  "nightmarewasborn": {
+   "display": "NightmareWasBorn",
+   "messages": 2,
+   "first_seen": 1792988281.2465394
+  },
+  "gingeontap": {
+   "display": "GingeOnTap",
+   "messages": 3,
+   "first_seen": 1792989648.9994278
+  },
+  "xlpawsielx": {
+   "display": "xlpawsielx",
+   "messages": 1,
+   "first_seen": 1792990393.3263826
+  },
+  "squirrelywrath": {
+   "display": "squirrelywrath",
+   "messages": 28,
+   "first_seen": 1792993336.390623
+  },
+  "heychelseagames": {
+   "display": "heychelseagames",
+   "messages": 2,
+   "first_seen": 1793061133.1749682
+  },
+  "scarfacettv36": {
+   "display": "scarfacettv36",
+   "messages": 16,
+   "first_seen": 1793062886.8102238
+  },
+  "moobot": {
+   "display": "Moobot",
+   "messages": 2,
+   "first_seen": 1793074546.0722477
+  },
+  "milehistoner": {
+   "display": "milehistoner",
+   "messages": 2,
+   "first_seen": 1793074572.9190407
+  },
+  "geminidex": {
+   "display": "GeminiDex",
+   "messages": 2,
+   "first_seen": 1793075637.534048
+  },
+  "dark_wraith10": {
+   "display": "dark_wraith10",
+   "messages": 1,
+   "first_seen": 1793077502.3300502
+  },
+  "wahidmeeter21": {
+   "display": "wahidmeeter21",
+   "messages": 2,
+   "first_seen": 1793121207.275581
+  },
+  "craftykat16": {
+   "display": "craftykat16",
+   "messages": 7,
+   "first_seen": 1793122741.1431851
+  },
+  "thejuice513": {
+   "display": "thejuice513",
+   "messages": 4,
+   "first_seen": 1793123794.1343699
+  },
+  "terrylarrythee4th": {
+   "display": "terrylarrythee4th",
+   "messages": 6,
+   "first_seen": 1793124491.415817
+  },
+  "justtally": {
+   "display": "JusttAlly",
+   "messages": 27,
+   "first_seen": 1793125082.9467947
+  },
+  "skizzypablo": {
+   "display": "Skizzypablo",
+   "messages": 6,
+   "first_seen": 1793125524.8883326
   }
  },
  "lore": [],
