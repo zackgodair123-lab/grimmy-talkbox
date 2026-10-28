@@ -2,27 +2,27 @@
  "regulars": {
   "freakyseafood19": {
    "display": "freakyseafood19",
-   "messages": 130,
+   "messages": 131,
    "first_seen": 1792443537.378232
   },
   "zackplayspro": {
    "display": "zackplayspro",
-   "messages": 122,
+   "messages": 142,
    "first_seen": 1792443537.571458
   },
   "pokemoncommunitygame": {
    "display": "PokemonCommunityGame",
-   "messages": 188,
+   "messages": 219,
    "first_seen": 1792443978.5023742
   },
   "streamelements": {
    "display": "StreamElements",
-   "messages": 42,
+   "messages": 48,
    "first_seen": 1792444513.1744053
   },
   "grimmy_ai": {
    "display": "grimmy_ai",
-   "messages": 113,
+   "messages": 149,
    "first_seen": 1792444515.281572
   },
   "draongirlttv": {
@@ -42,17 +42,17 @@
   },
   "treeckotv1": {
    "display": "treeckotv1",
-   "messages": 32,
+   "messages": 38,
    "first_seen": 1792445255.3136861
   },
   "soundalerts": {
    "display": "SoundAlerts",
-   "messages": 35,
+   "messages": 40,
    "first_seen": 1792445422.5803363
   },
   "og_alex_95": {
    "display": "og_alex_95",
-   "messages": 71,
+   "messages": 97,
    "first_seen": 1792445628.9024827
   },
   "the_cryptic_cryptid": {
@@ -62,12 +62,12 @@
   },
   "nexusqueenn": {
    "display": "nexusqueenn",
-   "messages": 10,
+   "messages": 13,
    "first_seen": 1792447180.7042634
   },
   "sery_bot": {
    "display": "Sery_Bot",
-   "messages": 30,
+   "messages": 32,
    "first_seen": 1792447961.6714995
   },
   "ghostydabz710": {
@@ -107,7 +107,7 @@
   },
   "leica__": {
    "display": "Leica__",
-   "messages": 1,
+   "messages": 2,
    "first_seen": 1792525844.7970886
   },
   "mr_rich_boy": {
@@ -147,7 +147,7 @@
   },
   "maniac_m3chan1c": {
    "display": "Maniac_M3chan1c",
-   "messages": 1,
+   "messages": 3,
    "first_seen": 1792608075.8366928
   },
   "pandarobbo": {
@@ -217,7 +217,7 @@
   },
   "davee936": {
    "display": "davee936",
-   "messages": 4,
+   "messages": 6,
    "first_seen": 1792952278.6613698
   },
   "babylorinha": {
@@ -262,12 +262,12 @@
   },
   "squirrelywrath": {
    "display": "squirrelywrath",
-   "messages": 28,
+   "messages": 31,
    "first_seen": 1792993336.390623
   },
   "heychelseagames": {
    "display": "heychelseagames",
-   "messages": 2,
+   "messages": 7,
    "first_seen": 1793061133.1749682
   },
   "scarfacettv36": {
@@ -277,7 +277,7 @@
   },
   "moobot": {
    "display": "Moobot",
-   "messages": 2,
+   "messages": 3,
    "first_seen": 1793074546.0722477
   },
   "milehistoner": {
@@ -317,13 +317,73 @@
   },
   "justtally": {
    "display": "JusttAlly",
-   "messages": 27,
+   "messages": 31,
    "first_seen": 1793125082.9467947
   },
   "skizzypablo": {
    "display": "Skizzypablo",
    "messages": 6,
    "first_seen": 1793125524.8883326
+  },
+  "quiet_bonfire": {
+   "display": "quiet_bonfire",
+   "messages": 10,
+   "first_seen": 1793156327.052117
+  },
+  "jfrogtm": {
+   "display": "jfrogTM",
+   "messages": 4,
+   "first_seen": 1793160560.6496198
+  },
+  "mrsyeti86": {
+   "display": "MrsYeti86",
+   "messages": 1,
+   "first_seen": 1793162572.8062851
+  },
+  "mryeti89": {
+   "display": "mryeti89",
+   "messages": 1,
+   "first_seen": 1793162641.8347383
+  },
+  "funshin3bear": {
+   "display": "FunShin3bear",
+   "messages": 6,
+   "first_seen": 1793188788.4355764
+  },
+  "bigttjace": {
+   "display": "BigTTJace",
+   "messages": 5,
+   "first_seen": 1793188797.40881
+  },
+  "ddg_deadeye9": {
+   "display": "DDG_Deadeye9",
+   "messages": 12,
+   "first_seen": 1793188812.9837303
+  },
+  "xxironmanexx": {
+   "display": "xxironmanexx",
+   "messages": 3,
+   "first_seen": 1793189897.2509665
+  },
+  "stanthemanspm": {
+   "display": "StanTheManSPM",
+   "messages": 4,
+   "first_seen": 1793190066.372649
+  },
+  "elbellakoski": {
+   "display": "elbellakoski",
+   "messages": 1,
+   "first_seen": 1793191214.8614812
+  },
+  "sc00by_d00bie_": {
+   "display": "SC00BY_D00BIE_",
+   "messages": 6,
+   "first_seen": 1793191355.2329018
+  },
+  "littlespooderbb": {
+   "display": "littlespooderbb",
+   "messages": 1,
+   "first_seen": 1793191594.0742877
   }
  },
  "lore": [],
